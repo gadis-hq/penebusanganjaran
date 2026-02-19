@@ -12,3 +12,24 @@ async function checkKod(){
 
   box.innerHTML=`<p style='color:lime'>Status: ${data.type}</p>`;
 }
+
+let html5QrCode;
+
+function startScanner(){
+
+  html5QrCode = new Html5Qrcode("reader");
+
+  Html5Qrcode.getCameras().then(devices=>{
+    if(devices && devices.length){
+      html5QrCode.start(
+        devices[0].id,
+        {fps:10, qrbox:250},
+        qrCodeMessage=>{
+          document.getElementById("kodInput").value = qrCodeMessage;
+          html5QrCode.stop();
+          checkKod();
+        }
+      );
+    }
+  });
+}
