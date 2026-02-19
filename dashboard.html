@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GQS HQ Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>🌸 GQS HQ Dashboard</h1>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Total Aktif</h2>
+      <div id="totalAktif" class="big">0</div>
+    </div>
+
+    <div class="card">
+      <h2>Total Ditebus</h2>
+      <div id="totalDitebus" class="big">0</div>
+    </div>
+
+    <div class="card">
+      <h2>Jumlah Keseluruhan</h2>
+      <div id="totalSemua" class="big">0</div>
+    </div>
+  </div>
+
+  <canvas id="malaysiaMap"></canvas>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo@4.3.0/build/index.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/map.js"></script>
+
+</body>
+</html>
