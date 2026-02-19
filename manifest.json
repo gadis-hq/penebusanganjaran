@@ -1,25 +1,8 @@
 {
-  "name": "GADIS QS HQ",
-  "short_name": "GADIS HQ",
-  "start_url": "/",
-  "scope": "/",
+  "name": "GQS Enterprise",
+  "short_name": "GQS",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "orientation": "portrait",
-  "background_color": "#fff0f5",
-  "theme_color": "#d4af37",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+  "start_url": "dashboard.html",
+  "background_color": "#14000f",
+  "theme_color": "#ff008c"
 }
