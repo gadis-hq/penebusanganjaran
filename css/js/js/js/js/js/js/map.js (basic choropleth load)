@@ -1,4 +1,0 @@
-async function loadMap(){
-  const geo = await fetch("data/malaysia.geojson").then(r=>r.json());
-}
-loadMap();
