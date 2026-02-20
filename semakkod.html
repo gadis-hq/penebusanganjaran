@@ -31,17 +31,22 @@ button{
 </head>
 <body>
 
-<div class="container">
-  <h2>🔎 Semak Kod Siri</h2>
+<!-- PREMIUM SCANNER CONTAINER -->
+<div class="scanner-card">
+    <h2>🔐 Imbas Kod Siri Rasmi</h2>
 
-  <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
-  <button onclick="checkKod()">Semak</button>
+    <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
 
-  <div id="result"></div>
+    <div class="button-group">
+        <button class="btn-gold" onclick="semakKod()">Semak Kod</button>
+        <button class="btn-pink" onclick="startScanner()">📷 Scan QR</button>
+        <button class="btn-close" onclick="stopScanner()">Tutup</button>
+    </div>
+
+    <div id="qr-reader"></div>
 </div>
 
-<script src="js/config.js"></script>
-<script src="js/api.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script src="js/semakkod.js"></script>
 
 </body>
