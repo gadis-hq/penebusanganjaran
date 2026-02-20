@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - GADIS QS HQ</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI, sans-serif;
+    background:linear-gradient(135deg,#1a001f,#330033);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+}
+
+.login-box{
+    width:100%;
+    max-width:380px;
+    background:rgba(255,0,150,0.08);
+    padding:30px;
+    border-radius:20px;
+    backdrop-filter:blur(20px);
+    box-shadow:0 0 40px rgba(255,0,150,0.3);
+    text-align:center;
+}
+
+h2{
+    color:#ff4da6;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:8px;
+    border:none;
+    font-size:15px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(45deg,#ff0080,#ff4da6);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 15px #ff4da6;
+}
+
+#msg{
+    margin-top:10px;
+    min-height:20px;
+}
+
+.success{ color:#00ff99; }
+.error{ color:#ff4d4d; }
+.locked{ color:#ff9900; }
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+    <h2>🔐 Admin HQ Login</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">LOGIN</button>
+
+    <div id="msg"></div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+const MAX_ATTEMPT = 3;
+const LOCK_TIME = 60000; // 1 minit
+
+function login(){
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const msg = document.getElementById("msg");
+
+    const lockUntil = localStorage.getItem("lockUntil");
+
+    if(lockUntil && Date.now() < lockUntil){
+        msg.innerHTML="<div class='locked'>Akaun dikunci sementara. Cuba lagi sebentar.</div>";
+        return;
+    }
+
+    let attempt = localStorage.getItem("loginAttempt") || 0;
+
+    if(username==="admin" && password==="GadisQS2026"){
+
+        localStorage.setItem("adminToken","LOGGED_IN");
+        localStorage.removeItem("loginAttempt");
+        localStorage.removeItem("lockUntil");
+
+        msg.innerHTML="<div class='success'>Login berjaya...</div>";
+
+        setTimeout(()=>{
+            window.location.href="dashboard.html";
+        },1000);
+
+    }else{
+
+        attempt++;
+        localStorage.setItem("loginAttempt",attempt);
+
+        if(attempt>=MAX_ATTEMPT){
+            localStorage.setItem("lockUntil",Date.now()+LOCK_TIME);
+            msg.innerHTML="<div class='locked'>Terlalu banyak cubaan. Dikunci 1 minit.</div>";
+        }else{
+            msg.innerHTML="<div class='error'>Username atau password salah.</div>";
+        }
+    }
+}
+</script>
+
+</body>
+</html>
