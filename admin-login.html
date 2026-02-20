@@ -93,45 +93,38 @@ button:hover{
 const MAX_ATTEMPT = 3;
 const LOCK_TIME = 60000; // 1 minit
 
-function login(){
+async function login(){
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const msg = document.getElementById("msg");
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
 
-    const lockUntil = localStorage.getItem("lockUntil");
+  msg.innerHTML="Memproses...";
 
-    if(lockUntil && Date.now() < lockUntil){
-        msg.innerHTML="<div class='locked'>Akaun dikunci sementara. Cuba lagi sebentar.</div>";
-        return;
-    }
+  try{
 
-    let attempt = localStorage.getItem("loginAttempt") || 0;
+    const data = await apiRequest({
+      action:"adminLogin",
+      username:username,
+      password:password
+    });
 
-    if(username==="admin" && password==="GadisQS2026"){
+    if(data.success){
 
-        localStorage.setItem("adminToken","LOGGED_IN");
-        localStorage.removeItem("loginAttempt");
-        localStorage.removeItem("lockUntil");
+      localStorage.setItem("adminToken",data.token);
+      msg.innerHTML="<span style='color:#00ff99'>Login berjaya</span>";
 
-        msg.innerHTML="<div class='success'>Login berjaya...</div>";
-
-        setTimeout(()=>{
-            window.location.href="dashboard.html";
-        },1000);
+      setTimeout(()=>{
+        window.location.href="dashboard.html";
+      },1000);
 
     }else{
-
-        attempt++;
-        localStorage.setItem("loginAttempt",attempt);
-
-        if(attempt>=MAX_ATTEMPT){
-            localStorage.setItem("lockUntil",Date.now()+LOCK_TIME);
-            msg.innerHTML="<div class='locked'>Terlalu banyak cubaan. Dikunci 1 minit.</div>";
-        }else{
-            msg.innerHTML="<div class='error'>Username atau password salah.</div>";
-        }
+      msg.innerHTML="<span style='color:#ff4d4d'>Login gagal</span>";
     }
+
+  }catch(err){
+    msg.innerHTML="<span style='color:#ff4d4d'>Ralat server</span>";
+  }
 }
 </script>
 
