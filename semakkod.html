@@ -89,18 +89,22 @@ button:hover{
 <h1>💎 Semak Kod Siri</h1>
 
 <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
+<button onclick="semakKod()">Semak Kod</button>
 
-<button onclick="checkKod()">🔎 Semak Kod</button>
+<br><br>
+
 <button onclick="startScanner()">📷 Scan QR</button>
+<button onclick="stopScanner()">❌ Tutup Kamera</button>
 
-<div id="resultBox"></div>
-<div id="reader"></div>
+<div id="qr-reader" style="width:300px; margin-top:20px;"></div>
 
 </div>
 
 <!-- JS FILES -->
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="js/semakkod.js"></script>  
 
 <script>
 async function checkKod(){
@@ -142,31 +146,49 @@ async function checkKod(){
 
 let html5QrCode;
 
-function startScanner(){
+function startScanner() {
+    const qrContainer = document.getElementById("qr-reader");
 
-  const reader = document.getElementById("reader");
-  reader.innerHTML="";
-
-  html5QrCode = new Html5Qrcode("reader");
-
-  Html5Qrcode.getCameras().then(devices=>{
-    if(devices.length){
-
-      html5QrCode.start(
-        devices[0].id,
-        {fps:10, qrbox:250},
-        qrCodeMessage=>{
-          document.getElementById("kodInput").value = qrCodeMessage;
-          html5QrCode.stop();
-          checkKod();
-        }
-      );
-
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
     }
-  }).catch(err=>{
-    document.getElementById("resultBox").innerHTML=
-    "<div class='error'>Tidak dapat akses kamera</div>";
-  });
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+    };
+
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            const cameraId = devices[0].id;
+
+            html5QrCode.start(
+                cameraId,
+                config,
+                qrCodeMessage => {
+                    document.getElementById("kodInput").value = qrCodeMessage;
+                    semakKod();
+                    stopScanner();
+                },
+                errorMessage => {
+                    // ignore scan error
+                }
+            );
+        }
+    }).catch(err => {
+        alert("Kamera tidak dapat diakses");
+        console.error(err);
+    });
+}
+
+function stopScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            document.getElementById("qr-reader").innerHTML = "";
+        }).catch(err => {
+            console.error(err);
+        });
+    }
 }
 </script>
 
