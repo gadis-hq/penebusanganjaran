@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Audience Screen</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d4af37">
+  
 <link rel="stylesheet" href="css/style.css">
 
 <style>
@@ -40,6 +43,13 @@ async function loadStatus(){
 setInterval(loadStatus,5000);
 loadStatus();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("SW Failed:", err));
+}
+</script>  
 
 </body>
 </html>
