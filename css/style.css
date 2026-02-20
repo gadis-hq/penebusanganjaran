@@ -1,3 +1,70 @@
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#fff0f5,#ffe4ec);
+    text-align:center;
+    margin:0;
+    padding:20px;
+}
+
+.scanner-card{
+    max-width:400px;
+    margin:auto;
+    padding:25px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.scanner-card h2{
+    color:#d4af37;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    margin-bottom:15px;
+}
+
+.button-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:20px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-gold{
+    background:#d4af37;
+    color:white;
+}
+
+.btn-pink{
+    background:#ff4da6;
+    color:white;
+}
+
+.btn-close{
+    background:#999;
+    color:white;
+}
+
+#qr-reader{
+    margin-top:15px;
+    border-radius:15px;
+    overflow:hidden;
+}
+
 /* Ultra Premium Pink Theme */
 
 body {
