@@ -94,6 +94,13 @@ function logout(){
     window.location.href="admin-login.html";
 }
 </script>
-
+    
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("SW Failed:", err));
+}
+</script>    
 </body>
 </html>
