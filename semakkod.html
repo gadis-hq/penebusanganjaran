@@ -4,193 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Semak Kod Siri</title>
-
 <link rel="stylesheet" href="css/style.css">
-<script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-body{
-  background:linear-gradient(135deg,#120012,#1a001f);
-  color:white;
-  font-family:Segoe UI, sans-serif;
-  text-align:center;
-  padding:30px 15px;
-}
-
-.container{
-  max-width:500px;
-  margin:auto;
-  background:rgba(255,0,150,0.08);
-  padding:25px;
-  border-radius:20px;
-  backdrop-filter:blur(15px);
-  box-shadow:0 0 40px rgba(255,0,150,0.2);
-}
-
-h1{
-  color:#ff4dc4;
-  margin-bottom:20px;
-}
-
+body{text-align:center;padding:40px 20px;}
+.container{max-width:500px;margin:auto;}
 input{
   width:100%;
   padding:12px;
-  border-radius:10px;
+  border-radius:8px;
   border:none;
   margin-bottom:15px;
-  font-size:16px;
 }
-
 button{
   width:100%;
   padding:12px;
   border:none;
-  border-radius:10px;
-  background:linear-gradient(90deg,#ff0080,#ff4dc4);
+  border-radius:8px;
+  background:linear-gradient(45deg,#ff0080,#ff4da6);
   color:white;
   font-weight:bold;
   cursor:pointer;
-  margin-bottom:10px;
-  transition:0.3s;
 }
-
-button:hover{
-  transform:scale(1.03);
-}
-
-#resultBox{
-  margin-top:15px;
-  min-height:40px;
-  font-weight:bold;
-}
-
-.success{
-  color:#00ff99;
-}
-
-.error{
-  color:#ff4d4d;
-}
-
-.loading{
-  color:#ffb3ec;
-}
-
-#reader{
-  margin-top:15px;
-}
+#result{margin-top:15px;font-weight:bold;}
 </style>
-
 </head>
 <body>
 
 <div class="container">
+  <h2>🔎 Semak Kod Siri</h2>
 
-<h1>💎 Semak Kod Siri</h1>
+  <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
+  <button onclick="checkKod()">Semak</button>
 
-<input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
-<button onclick="semakKod()">Semak Kod</button>
-
-<br><br>
-
-<button onclick="startScanner()">📷 Scan QR</button>
-<button onclick="stopScanner()">❌ Tutup Kamera</button>
-
-<div id="qr-reader" style="width:300px; margin-top:20px;"></div>
-
+  <div id="result"></div>
 </div>
 
-<!-- JS FILES -->
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script src="js/semakkod.js"></script>  
-
-<script>
-async function checkKod(){
-  
-  alert("Button OK");
-
-  const kod = document.getElementById("kodInput").value.trim();
-  const resultBox = document.getElementById("resultBox");
-
-  if(!kod){
-    resultBox.innerHTML="<div class='error'>Sila masukkan kod dahulu</div>";
-    return;
-  }
-
-  resultBox.innerHTML="<div class='loading'>Memproses...</div>";
-
-  try{
-
-    const data = await apiRequest({
-      action:"checkKod",
-      code:kod
-    });
-
-    if(data.success){
-      resultBox.innerHTML="<div class='success'>✅ Kod Sah & Layak Tebus</div>";
-    }else{
-      resultBox.innerHTML="<div class='error'>❌ "+data.message+"</div>";
-    }
-
-  }catch(err){
-    console.error(err);
-    resultBox.innerHTML="<div class='error'>Ralat sambungan server</div>";
-  }
-}
-
-/* ===============================
-   QR CAMERA MODE
-================================= */
-
-let html5QrCode;
-
-function startScanner() {
-    const qrContainer = document.getElementById("qr-reader");
-
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("qr-reader");
-    }
-
-    const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-    };
-
-    Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) {
-            const cameraId = devices[0].id;
-
-            html5QrCode.start(
-                cameraId,
-                config,
-                qrCodeMessage => {
-                    document.getElementById("kodInput").value = qrCodeMessage;
-                    semakKod();
-                    stopScanner();
-                },
-                errorMessage => {
-                    // ignore scan error
-                }
-            );
-        }
-    }).catch(err => {
-        alert("Kamera tidak dapat diakses");
-        console.error(err);
-    });
-}
-
-function stopScanner() {
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            document.getElementById("qr-reader").innerHTML = "";
-        }).catch(err => {
-            console.error(err);
-        });
-    }
-}
-</script>
+<script src="js/semakkod.js"></script>
 
 </body>
 </html>
