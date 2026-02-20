@@ -1,0 +1,24 @@
+/* Ultra Premium Pink Theme */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1a001f, #330033);
+    color: #fff;
+}
+
+button {
+    background: linear-gradient(45deg, #ff0080, #ff4da6);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ff4da6;
+}
