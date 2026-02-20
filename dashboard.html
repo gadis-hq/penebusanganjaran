@@ -3,49 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GQS HQ Dashboard</title>
-<link rel="manifest" href="manifest.json">
+<title>Dashboard Admin - GADIS QS HQ</title>
+
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI, sans-serif;
+    background:linear-gradient(135deg,#1a001f,#330033);
+    color:white;
+}
+
+.header{
+    padding:20px;
+    background:rgba(255,0,150,0.1);
+    backdrop-filter:blur(10px);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+h1{
+    color:#ff4da6;
+    margin:0;
+}
+
+button{
+    background:linear-gradient(45deg,#ff0080,#ff4da6);
+    border:none;
+    padding:10px 16px;
+    border-radius:8px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.container{
+    padding:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+    box-shadow:0 0 20px rgba(255,0,150,0.2);
+}
+</style>
+
+<script>
+/* ===========================
+   PROTECT DASHBOARD ACCESS
+=========================== */
+if(!localStorage.getItem("adminToken")){
+    window.location.href="admin-login.html";
+}
+</script>
+
 </head>
 <body>
 
+<div class="header">
+    <h1>💎 Admin Dashboard</h1>
+    <button onclick="logout()">Logout</button>
+</div>
+
 <div class="container">
-  <h1>🌸 GQS HQ Dashboard</h1>
 
-  <div class="grid">
     <div class="card">
-      <h2>Total Aktif</h2>
-      <div id="totalAktif" class="big">0</div>
+        <h3>Status Sistem</h3>
+        <p>Dashboard aktif dan dilindungi.</p>
     </div>
 
     <div class="card">
-      <h2>Total Ditebus</h2>
-      <div id="totalDitebus" class="big">0</div>
+        <h3>Menu Cepat</h3>
+        <p>
+            <a href="semakkod.html" style="color:#ff4da6;">Semak Kod Siri</a>
+        </p>
     </div>
-
-    <div class="card">
-      <h2>Jumlah Keseluruhan</h2>
-      <div id="totalSemua" class="big">0</div>
-    </div>
-  </div>
-
-  <canvas id="malaysiaMap"></canvas>
 
 </div>
-<script
-if(localStorage.getItem("adminToken")!=="LOGGED_IN"){
-    window.location.href="admin-login.html";
-}  
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo@4.3.0/build/index.umd.min.js"></script>
-<script src="js/config.js"></script>
-<script src="js/api.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/map.js"></script>
-<script src="js/auth.js"></script>
+
 <script>
-checkAdminSession();
-</script>  
+function logout(){
+    localStorage.removeItem("adminToken");
+    window.location.href="admin-login.html";
+}
+</script>
 
 </body>
 </html>
