@@ -3,64 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Semak Kod Siri</title>
+<title>Semak Kod HQ</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d4af37">
-  
+<meta name="theme-color" content="#d4af37"> 
 <link rel="stylesheet" href="css/style.css">
-
-<style>
-body{text-align:center;padding:40px 20px;}
-.container{max-width:500px;margin:auto;}
-input{
-  width:100%;
-  padding:12px;
-  border-radius:8px;
-  border:none;
-  margin-bottom:15px;
-}
-button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background:linear-gradient(45deg,#ff0080,#ff4da6);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-#result{margin-top:15px;font-weight:bold;}
-</style>
+<script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/semakkod.js" defer></script>
 </head>
 <body>
 
-<!-- PREMIUM SCANNER CONTAINER -->
-<div class="scanner-card">
-    <h2>🔐 Imbas Kod Siri Rasmi</h2>
+<div class="container">
 
+  <h1>🛡 Semak Kod Ganjaran</h1>
+
+  <div class="input-group">
     <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
+    <button onclick="semakKod()">✅ Semak Kod</button>
+    <button onclick="startScanner()">📷 Scan QR</button>
+  </div>
 
-    <div class="button-group">
-        <button class="btn-gold" onclick="semakKod()">Semak Kod</button>
-        <button class="btn-pink" onclick="startScanner()">📷 Scan QR</button>
-        <button class="btn-close" onclick="stopScanner()">Tutup</button>
-    </div>
+  <div id="qr-reader" style="display:none; margin-top:10px;"></div>
 
-    <div id="qr-reader"></div>
-    <div id="result"></div>
+  <div id="result" class="result-box"></div>
+
+  <a id="btnSijil" target="_blank"
+     style="display:none; padding:10px 18px; margin-top:10px;
+            background:linear-gradient(45deg,#d4af37,#f8e58c);
+            color:black; font-weight:bold; border-radius:30px; text-decoration:none;">
+    Muat Turun Sijil Rasmi
+  </a>
+
 </div>
 
-<script src="js/config.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script src="js/semakkod.js"></script>
+<!-- Confetti -->
+<canvas id="confetti-canvas"></canvas>
 
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.log("SW Failed:", err));
-}
-</script>
+<script src="js/confetti.js" defer></script>
   
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('ServiceWorker registered.', reg))
+        .catch(err => console.log('ServiceWorker registration failed:', err));
+    });
+  }
+</script> 
 </body>
 </html>
