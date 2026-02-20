@@ -1,20 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
 <meta charset="UTF-8">
-<title>LED Stage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audience Screen</title>
 <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="stage">
 
-<div class="stageBox">
-  <div class="stageLabel">JUMLAH KESELURUHAN</div>
-  <div id="stageTotal" class="stageBig">0</div>
-</div>
+<style>
+body{text-align:center;padding:40px;}
+#liveStatus{
+  font-size:22px;
+  margin-top:20px;
+  color:#ff4da6;
+}
+</style>
+</head>
+<body>
+
+<h1>📺 Audience Screen</h1>
+<p>Status Tebusan Langsung</p>
+
+<div id="liveStatus">Menunggu data...</div>
 
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
-<script src="js/stage.js"></script>
+
+<script>
+async function loadStatus(){
+  try{
+    const data = await apiRequest({action:"liveStatus"});
+    document.getElementById("liveStatus").innerText =
+      data.message || "Tiada data";
+  }catch{
+    document.getElementById("liveStatus").innerText =
+      "Gagal sambung server";
+  }
+}
+
+setInterval(loadStatus,5000);
+loadStatus();
+</script>
 
 </body>
 </html>
