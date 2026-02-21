@@ -1,11 +1,11 @@
 {
-  "name": "GADIS QS HQ – Sistem Penebusan Rasmi",
-  "short_name": "GADIS QS",
-  "start_url": "/index.html",
+  "name": "GADIS QS HQ - Semak Kod & Sijil",
+  "short_name": "GADIS HQ",
+  "start_url": "semakkod.html",
   "display": "standalone",
-  "background_color": "#fff0f5",
+  "background_color": "#ffe0f0",
   "theme_color": "#d4af37",
-  "orientation": "portrait",
+  "description": "Semak kod ganjaran dan muat turun sijil rasmi Gadis QS HQ",
   "icons": [
     {
       "src": "icons/icon-192.png",
