@@ -39,7 +39,13 @@ a{
   <a href="semakkod.html">Semak Kod Siri</a>
   <a href="admin-login.html">Admin Login</a>
 </div>
-
+  
+<script>
+if ("Notification" in window) {
+    Notification.requestPermission();
+}
+</script>
+  
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
