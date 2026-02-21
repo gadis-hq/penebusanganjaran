@@ -3,171 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Admin - GADIS QS HQ</title>
-    
+
+<title>GADIS QS HQ – LIVE DASHBOARD</title>
+
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d4af37">
-    
-<link rel="stylesheet" href="css/style.css">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>    
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family:Segoe UI, sans-serif;
-    background:linear-gradient(135deg,#1a001f,#330033);
-    color:white;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#fff0f5,#ffe4ec);
+    color:#333;
 }
-
-.header{
+header{
+    background:#d4af37;
+    color:white;
     padding:20px;
-    background:rgba(255,0,150,0.1);
-    backdrop-filter:blur(10px);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-h1{
-    color:#ff4da6;
-    margin:0;
-}
-
-button{
-    background:linear-gradient(45deg,#ff0080,#ff4da6);
-    border:none;
-    padding:10px 16px;
-    border-radius:8px;
-    color:white;
+    text-align:center;
+    font-size:22px;
     font-weight:bold;
-    cursor:pointer;
+    letter-spacing:1px;
 }
-
-.container{
-    padding:20px;
-}
-
-.card{
-    background:rgba(255,255,255,0.05);
-    padding:20px;
-    border-radius:15px;
+.container{ padding:20px; }
+.stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
     margin-bottom:20px;
-    box-shadow:0 0 20px rgba(255,0,150,0.2);
+}
+.card{
+    flex:1;
+    min-width:250px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+#grandTotalLED{
+    font-size:50px;
+    font-weight:bold;
+    color:#d4af37;
+    text-align:center;
+}
+ul{ padding-left:20px; }
+#heatmap-map{
+    height:500px;
+    border-radius:12px;
+    overflow:hidden;
+    margin-top:20px;
+}
+footer{
+    text-align:center;
+    padding:15px;
+    font-size:14px;
+    color:#777;
+}
+@media(max-width:768px){
+    #grandTotalLED{font-size:36px;}
 }
 </style>
-
-<script>
-/* ===========================
-   PROTECT DASHBOARD ACCESS
-=========================== */
-if(!localStorage.getItem("adminToken")){
-    window.location.href="admin-login.html";
-}
-</script>
-
 </head>
+
 <body>
 
-<div class="header">
-    <h1>💎 Admin Dashboard</h1>
-    <button onclick="logout()">Logout</button>
-</div>
+<header>
+GADIS QS HQ – LIVE CONTEST DASHBOARD
+</header>
 
 <div class="container">
 
     <div class="card">
-        <h3>Status Sistem</h3>
-        <p>Dashboard aktif dan dilindungi.</p>
+        <div style="text-align:center;font-size:18px;">GRAND TOTAL KOD</div>
+        <div id="grandTotalLED">0</div>
+    </div>
+
+    <div class="stats">
+
+        <div class="card">
+            <div id="totalKod">Total Kod: 0</div>
+            <div id="aktifKod">Aktif / Belum Ditebus: 0</div>
+            <div id="ditebusKod">Telah Ditebus: 0</div>
+        </div>
+
+        <div class="card">
+            <h3>Top 5 Bandar</h3>
+            <ul id="top5Bandar"></ul>
+        </div>
+
     </div>
 
     <div class="card">
-        <h3>Menu Cepat</h3>
-        <p>
-            <a href="semakkod.html" style="color:#ff4da6;">Semak Kod Siri</a>
-        </p>
+        <h3>Heatmap Penyertaan Malaysia</h3>
+        <div id="heatmap-map"></div>
     </div>
 
 </div>
 
+<footer>
+© 2026 GADIS QS HQ – QAN Solution (M) BHD
+</footer>
+
+<!-- Audio Ding -->
+<audio id="ding" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+<!-- Config -->
 <script>
-function logout(){
-    localStorage.removeItem("adminToken");
-    window.location.href="admin-login.html";
+const CONFIG = {
+    API_URL: "https://script.google.com/macros/s/AKfycbxKXIu6STJewe_562xKMdqaeSN20fZpdLWFVqW_x2IvLQB13G6YZwHmfa845Egy8tC9/exec"
+};
+</script>
+
+<!-- Confetti -->
+<script>
+function launchConfetti(){
+    confetti({
+        particleCount:120,
+        spread:70,
+        origin:{y:0.6},
+        colors:['#ff99cc','#d4af37','#fff0f5']
+    });
 }
 </script>
-    
+
+<!-- SERVICE WORKER REGISTER -->
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.log("SW Failed:", err));
 }
+</script>
+
 <script>
-/* ==========================
-   ANTI SCREENSHOT PROTECTION
-========================== */
-function activateProtection() {
+/* =====================================
+   GADIS QS HQ – ANTI SCREENSHOT LAYER
+===================================== */
+function activateProtection(){
 
     const body = document.body;
 
-    // Dynamic watermark overlay
+    /* ===== Dynamic Watermark ===== */
     const wm = document.createElement("div");
     wm.style.position = "fixed";
     wm.style.top = "50%";
     wm.style.left = "50%";
     wm.style.transform = "translate(-50%, -50%) rotate(-30deg)";
     wm.style.fontSize = "40px";
-    wm.style.opacity = "0.08";
+    wm.style.fontWeight = "bold";
+    wm.style.opacity = "0.07";
     wm.style.pointerEvents = "none";
     wm.style.zIndex = "9999";
     wm.style.whiteSpace = "nowrap";
     wm.innerText = "GADIS QS HQ • " + new Date().toLocaleString();
     body.appendChild(wm);
 
-    // Blur when tab inactive
+    /* ===== Blur when tab inactive ===== */
     document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            body.style.filter = "blur(12px)";
-        } else {
-            body.style.filter = "none";
+        if(document.hidden){
+            body.style.filter="blur(12px)";
+        }else{
+            body.style.filter="none";
         }
     });
 
-    // Block PrintScreen (basic attempt)
-    document.addEventListener("keyup", function(e) {
-        if (e.key === "PrintScreen") {
-            body.style.filter = "blur(15px)";
-            setTimeout(() => body.style.filter = "none", 2000);
+    /* ===== Block PrintScreen ===== */
+    document.addEventListener("keyup", function(e){
+        if(e.key==="PrintScreen"){
+            body.style.filter="blur(15px)";
+            setTimeout(()=>body.style.filter="none",2000);
         }
     });
 
-    // Disable right click
-    document.addEventListener("contextmenu", e => e.preventDefault());
+    /* ===== Disable Right Click ===== */
+    document.addEventListener("contextmenu", e=>e.preventDefault());
 
-    // Disable Ctrl+P
+    /* ===== Disable Ctrl+P / Ctrl+S ===== */
     document.addEventListener("keydown", function(e){
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+        if((e.ctrlKey||e.metaKey) && 
+           (e.key.toLowerCase()==="p" || e.key.toLowerCase()==="s")){
             e.preventDefault();
         }
     });
 
-    // Detect DevTools open
-    let devtools = false;
-    setInterval(() => {
+    /* ===== DevTools Detection ===== */
+    let devtoolsOpen=false;
+    setInterval(()=>{
         const widthThreshold = window.outerWidth - window.innerWidth > 160;
         const heightThreshold = window.outerHeight - window.innerHeight > 160;
-        if (widthThreshold || heightThreshold) {
-            if (!devtools) {
-                body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>⚠ Sistem Dilindungi</h1>";
-                devtools = true;
+
+        if(widthThreshold || heightThreshold){
+            if(!devtoolsOpen){
+                body.innerHTML="<h1 style='text-align:center;margin-top:20%;'>⚠ Sistem Dilindungi</h1>";
+                devtoolsOpen=true;
             }
         }
-    }, 1000);
+    },1000);
+
 }
 
-activateProtection();    
-</script>    
+activateProtection();
+</script>   
+
+<!-- Dashboard Logic -->
+<script src="dashboard.js"></script>
+
 </body>
 </html>
