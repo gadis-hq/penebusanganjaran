@@ -1,47 +1,18 @@
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(120deg, #ffe0f0, #f8e58c);
-  margin:0; padding:0;
-}
-.container {
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 20px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.2);
-  text-align: center;
-}
-input[type=text] {
-  width: 65%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 2px solid #d4af37;
-}
-button {
-  padding: 10px 15px;
-  border:none;
-  border-radius: 10px;
-  margin-left:5px;
-  background: linear-gradient(45deg, #d4af37,#f8e58c);
-  cursor: pointer;
-  font-weight:bold;
-}
-.result-box {
-  margin-top:20px;
-  padding:15px;
-  border-radius:10px;
-  min-height:80px;
-  font-weight:bold;
-  font-size:14px;
-}
-.result-box.green {
-  background: linear-gradient(45deg,#a0ffb0,#d4af37);
-  color:#000;
-}
-.result-box.red {
-  background: linear-gradient(45deg,#ff7f7f,#d4af37);
-  color:#000;
+body{font-family:sans-serif;background:#ffe0f0;color:#333;margin:0;padding:0}
+.container{padding:20px}
+h1,h2{color:#d4af37;text-align:center}
+.stats-cards{display:flex;justify-content:space-around;margin:20px 0}
+.card{background:#fff0f5;border:2px solid #d4af37;padding:20px;border-radius:10px;width:30%;text-align:center;font-size:1.2em;box-shadow:0 0 15px rgba(212,175,55,.4)}
+.top5 ul{list-style:none;padding:0;text-align:center}
+.top5 li{font-size:1.1em;margin:5px 0}
+.heatmap canvas{border:2px solid #d4af37;background:#fff0f5;display:block;margin:0 auto}
+.grand-total{text-align:center;margin:30px 0;font-size:2em;color:#d4af37;font-weight:bold}
+.led-screen{background:#d4af37;color:#fff;font-size:6em;text-align:center;height:100vh;display:flex;align-items:center;justify-content:center}
+.status-badge{padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;animation:badgeGlow 1s ease-in-out infinite alternate}
+.status-badge.emerald{background:#4caf50;color:#fff}
+.status-badge.gold{background:#d4af37;color:#fff}
+.btn-sijil{display:inline-block;margin-top:10px;padding:10px 15px;background:#d4af37;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold}
+@keyframes badgeGlow{0%{box-shadow:0 0 5px #fff}100%{box-shadow:0 0 20px #fff}}
 }
 /* css/style.css */
 .screenshot-overlay{
