@@ -1,33 +1,41 @@
 let html5QrCode;
 let currentCameraId = null;
 
-async function semakKod(){
-  const kod = document.getElementById("kodInput").value.trim();
-  const resultBox = document.getElementById("result");
-  if(!kod){resultBox.innerHTML="<span style='color:red;'>Sila masukkan kod.</span>"; return;}
-  resultBox.innerHTML="⏳ Sedang semak...";
-  try{
-    const data = await fetchKod(kod);
-    if(data.success){
-      const badgeClass = data.status_kod.replace(/\s/g,'').toLowerCase();
-      resultBox.innerHTML=`<div class="badge-${badgeClass}">
-        ${data.kod_siri_status}<br>
-        Nama: ${data.nama}<br>
-        Hadiah: ${data.hadiah}<br>
-        No Telefon: ${data.no_telefon}<br>
-        No IC: ${data.no_ic}<br>
-        Status Penebusan: ${data.status_penebusan}<br>
-        Disahkan Oleh: ${data.disahkan_oleh}<br>
-        Bandar / Negeri: ${data.bandar_negeri}
-      </div>`;
-      document.getElementById("btnSijil").href = data.sijil_url;
-      if(data.status_kod==="SAH / TELAH DITEBUS") confetti();
-    }else{
-      resultBox.innerHTML=`<span style="color:red;">❌ ${data.kod_siri_status}</span>`;
+async function semakKod() {
+    const kod = document.getElementById("kodInput").value.trim();
+    const resultBox = document.getElementById("result");
+
+    if (!kod) {
+        resultBox.innerHTML = "<span style='color:red;'>Sila masukkan kod.</span>";
+        return;
     }
-  }catch(e){
-    resultBox.innerHTML="<span style='color:red;'>Ralat sambungan server.</span>";
-  }
+
+    resultBox.innerHTML = "⏳ Sedang semak...";
+
+    try {
+        const response = await fetch(CONFIG.API_URL + "?kod=" + encodeURIComponent(kod));
+        const data = await response.json();
+
+        if (data.success) {
+            resultBox.innerHTML = `
+                <div style="color:green;">
+                    ✅ ${data.kod_siri_status}<br>
+                    Nama: ${data.nama}<br>
+                    Status Penebusan: ${data.status_penebusan}
+                </div>
+            `;
+        } else {
+            resultBox.innerHTML = `
+                <div style="color:red;">
+                    ❌ Kod Tidak Sah
+                </div>
+            `;
+        }
+
+    } catch (error) {
+        resultBox.innerHTML = "<span style='color:red;'>Ralat sambungan server.</span>";
+        console.error(error);
+    }
 }
 
 async function startScanner(){
