@@ -44,6 +44,12 @@ async function semakKod() {
         Bandar / Negeri: ${data.bandar_negeri || "-"}
       </div>
     `;
+    // Generate sijil PDF auto
+    generateSijil(data.nama, data.hadiah, data.bandar_negeri).then(url=>{
+        document.getElementById("btnSijil").href = url;
+    });
+    launchConfetti();
+}
 
   } catch (err) {
     resultBox.className = "result-box red";
