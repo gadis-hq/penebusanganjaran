@@ -101,6 +101,70 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.log("SW Failed:", err));
 }
+<script>
+/* ==========================
+   ANTI SCREENSHOT PROTECTION
+========================== */
+function activateProtection() {
+
+    const body = document.body;
+
+    // Dynamic watermark overlay
+    const wm = document.createElement("div");
+    wm.style.position = "fixed";
+    wm.style.top = "50%";
+    wm.style.left = "50%";
+    wm.style.transform = "translate(-50%, -50%) rotate(-30deg)";
+    wm.style.fontSize = "40px";
+    wm.style.opacity = "0.08";
+    wm.style.pointerEvents = "none";
+    wm.style.zIndex = "9999";
+    wm.style.whiteSpace = "nowrap";
+    wm.innerText = "GADIS QS HQ • " + new Date().toLocaleString();
+    body.appendChild(wm);
+
+    // Blur when tab inactive
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            body.style.filter = "blur(12px)";
+        } else {
+            body.style.filter = "none";
+        }
+    });
+
+    // Block PrintScreen (basic attempt)
+    document.addEventListener("keyup", function(e) {
+        if (e.key === "PrintScreen") {
+            body.style.filter = "blur(15px)";
+            setTimeout(() => body.style.filter = "none", 2000);
+        }
+    });
+
+    // Disable right click
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    // Disable Ctrl+P
+    document.addEventListener("keydown", function(e){
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+            e.preventDefault();
+        }
+    });
+
+    // Detect DevTools open
+    let devtools = false;
+    setInterval(() => {
+        const widthThreshold = window.outerWidth - window.innerWidth > 160;
+        const heightThreshold = window.outerHeight - window.innerHeight > 160;
+        if (widthThreshold || heightThreshold) {
+            if (!devtools) {
+                body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>⚠ Sistem Dilindungi</h1>";
+                devtools = true;
+            }
+        }
+    }, 1000);
+}
+
+activateProtection();    
 </script>    
 </body>
 </html>
