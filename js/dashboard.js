@@ -1,6 +1,31 @@
 /* =========================================
    GADIS QS HQ – DASHBOARD FINAL VERSION
 ========================================= */
+let lastCount = 0;
+
+async function checkPenebusan() {
+
+    const response = await fetch(CONFIG.API_URL + "?heatmap=true");
+    const data = await response.json();
+
+    let total = 0;
+    data.heatmap.forEach(item => total += item.jumlah);
+
+    if (lastCount !== 0 && total > lastCount) {
+        showNotification("Kod Baru Telah Ditebus 🎉");
+    }
+
+    lastCount = total;
+}
+
+function showNotification(message) {
+    if (Notification.permission === "granted") {
+        new Notification(message);
+    }
+}
+
+setInterval(checkPenebusan, 10000); // check setiap 10 saat
+
 
 let lastTotal = 0;
 let heatmapInstance = null;
