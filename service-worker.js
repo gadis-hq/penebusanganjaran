@@ -1,18 +1,15 @@
 const CACHE_NAME="gadis-hq-cache-v1";
 const urlsToCache=[
-  "/",
   "/index.html",
-  "/audience-screen.html",
   "/semakkod.html",
+  "/audience-screen.html",
   "/css/style.css",
   "/js/config.js",
-  "/js/dashboard.js",
+  "/js/api.js",
   "/js/semakkod.js",
-  "/js/confetti.js",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "/js/dashboard.js",
+  "/js/auth.js",
+  "/data/malaysia.geojson"
 ];
-
-self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(urlsToCache)))});
-self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>{if(k!==CACHE_NAME)return caches.delete(k);}))))});
-self.addEventListener("fetch",event=>{event.respondWith(caches.match(event.request).then(r=>r||fetch(event.request)))});
+self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))); });
+self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(resp => resp || fetch(e.request))); });
