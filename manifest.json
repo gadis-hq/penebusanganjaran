@@ -6,6 +6,7 @@
   "background_color": "#ffe0f0",
   "theme_color": "#d4af37",
   "description": "Semak kod ganjaran dan muat turun sijil rasmi Gadis QS HQ",
+  "gcm_sender_id": "103953800507", 
   "icons": [
     {
       "src": "icons/icon-192.png",
