@@ -7,14 +7,14 @@
   "theme_color": "#d4af37",
   "description": "Semak kod ganjaran dan muat turun sijil rasmi Gadis QS HQ",
   "gcm_sender_id": "103953800507", 
-  "icons": [
+  "icon": [
     {
-      "src": "icons/icon-192.png",
+      "src": "icon/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icon/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
