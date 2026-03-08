@@ -3,55 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>GADIS QS HQ</title>
-<link rel="stylesheet" href="css/style.css">
+
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d4af37">  
+<meta name="theme-color" content="#d4af37">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <style>
+
 body{
-  text-align:center;
-  padding:40px 20px;
+margin:0;
+font-family:Arial;
+background:#fff0f5;
+text-align:center;
 }
+
+/* HEADER */
+
+header{
+background:linear-gradient(45deg,#ff0080,#ff4da6);
+color:white;
+padding:25px;
+}
+
+/* CONTAINER */
+
 .container{
-  max-width:500px;
-  margin:auto;
+max-width:1000px;
+margin:auto;
+padding:20px;
 }
-h1{
-  color:#ff4da6;
+
+/* SEMAK KOD */
+
+.box{
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+margin:30px 0;
+position:relative;
 }
-a{
-  display:block;
-  margin:15px 0;
-  padding:15px;
-  background:linear-gradient(45deg,#ff0080,#ff4da6);
-  color:white;
-  text-decoration:none;
-  border-radius:10px;
-  font-weight:bold;
+
+/* SCAN LASER */
+
+.laser{
+position:absolute;
+height:3px;
+width:100%;
+background:red;
+animation:scan 2s infinite;
+display:none;
 }
+
+@keyframes scan{
+0%{top:0}
+50%{top:100%}
+100%{top:0}
+}
+
+/* INPUT */
+
+input{
+width:80%;
+padding:15px;
+font-size:16px;
+border-radius:10px;
+border:1px solid #ccc;
+text-align:center;
+}
+
+button{
+padding:14px 25px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#ff0080,#ff4da6);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* LOADING TEXT */
+
+.loading{
+font-style:italic;
+color:#999;
+filter:blur(1px);
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:0.5}
+50%{opacity:1}
+100%{opacity:0.5}
+}
+
+/* RESULT */
+
+.resultCard{
+background:#fff;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+text-align:left;
+}
+
+/* COUNTER */
+
+.counter{
+font-size:28px;
+color:#ff0080;
+font-weight:bold;
+margin:20px 0;
+}
+
+/* MAP */
+
+#map{
+height:400px;
+border-radius:10px;
+}
+
+/* SIJIL */
+
+#sijil{
+display:none;
+margin-top:20px;
+}
+
+#installBtn{
+display:none;
+margin-top:20px;
+}
+
 </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>💎 GADIS QS HQ</h1>
+<header>
+<h1>💎 GADIS QS HQ</h1>
+<p>Sistem Semakan Kod Siri Rasmi</p>
+</header>
 
-  <a href="semakkod.html">Semak Kod Siri</a>
-  <a href="admin-login.html">Admin Login</a>
+<div class="container">
+
+<!-- SEMAK KOD -->
+
+<div class="box">
+
+<div class="laser" id="laser"></div>
+
+<h2>🔎 Semak Kod Siri</h2>
+
+<input id="kodInput" placeholder="Masukkan Kod Siri">
+
+<br>
+
+<button onclick="semakKod()">Semak Kod</button>
+
+<p id="loadingText"></p>
+
+<div id="result"></div>
+
+<img id="sijil" width="100%">
+
 </div>
-  
+
+<!-- COUNTER HADIAH -->
+
+<h2>💰 Jumlah Hadiah Disahkan</h2>
+
+<div class="counter" id="counterRM">RM0</div>
+
+<!-- GRAF HADIAH -->
+
+<canvas id="graf"></canvas>
+
+<h2>📍 Peta Pemenang Malaysia</h2>
+
+<div id="map"></div>
+
+<button id="installBtn">📲 Install App</button>
+
+</div>
+
 <script>
-if ("Notification" in window) {
-    Notification.requestPermission();
+
+/* SERVER */
+
+const WEB_APP="https://script.google.com/macros/s/AKfycbxKXIu6STJewe_562xKMdqaeSN20fZpdLWFVqW_x2IvLQB13G6YZwHmfa845Egy8tC9/exec";
+
+/* SEMAK KOD */
+
+function semakKod(){
+
+const kod=document.getElementById("kodInput").value.trim().toUpperCase();
+
+const laser=document.getElementById("laser");
+const loading=document.getElementById("loadingText");
+
+laser.style.display="block";
+loading.innerHTML="⏳ Sedang menyemak kod siri...";
+loading.className="loading";
+
+fetch(WEB_APP+"?mode=semak&kod="+kod)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+laser.style.display="none";
+loading.innerHTML="";
+
+if(!data.success){
+
+document.getElementById("result").innerHTML=
+"<b style='color:red'>"+data.kod_siri_status+"</b>";
+
+return;
+
 }
+
+let html=`
+
+<div class="resultCard">
+
+<h3 style="color:green">${data.kod_siri_status}</h3>
+
+<b>Nama:</b> ${data.nama}<br>
+<b>Hadiah:</b> ${data.hadiah}<br>
+<b>Bandar / Negeri:</b> ${data.bandar_negeri}<br>
+<b>Status Tebusan:</b> ${data.status_penebusan}
+
+</div>
+
+`;
+
+document.getElementById("result").innerHTML=html;
+
+if(data.sijil_url){
+document.getElementById("sijil").src=data.sijil_url;
+document.getElementById("sijil").style.display="block";
+}
+
+})
+
+.catch(err=>{
+
+laser.style.display="none";
+
+loading.innerHTML="Ralat sambungan server";
+
+});
+
+}
+
+/* COUNTER HADIAH */
+
+let target=500000;
+let current=0;
+
+function updateCounter(){
+
+current+=500;
+
+if(current>target) current=target;
+
+document.getElementById("counterRM").innerText="RM"+current.toLocaleString();
+
+if(current<target) requestAnimationFrame(updateCounter);
+
+}
+
+updateCounter();
+
+/* GRAF */
+
+new Chart(document.getElementById("graf"),{
+
+type:'line',
+
+data:{
+labels:["Jan","Feb","Mac","Apr","Mei","Jun"],
+datasets:[{
+label:"Jumlah Hadiah",
+data:[50000,70000,120000,200000,350000,500000],
+borderColor:"#ff0080",
+tension:0.4
+}]
+},
+
+options:{animation:{duration:3000}}
+
+});
+
+/* MAP */
+
+var map=L.map('map').setView([4.2,101.9],6);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map);
+
+/* contoh data pemenang */
+
+const winners=[
+
+{nama:"NORAINI BINTI MUHAMMAD",lat:4.5975,lng:101.0901}
+
+];
+
+winners.forEach(w=>{
+
+L.marker([w.lat,w.lng])
+.addTo(map)
+.bindPopup(w.nama);
+
+});
+
+/* PWA INSTALL */
+
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt',(e)=>{
+
+e.preventDefault();
+
+deferredPrompt=e;
+
+document.getElementById("installBtn").style.display="block";
+
+});
+
+document.getElementById("installBtn").onclick=()=>{
+
+deferredPrompt.prompt();
+
+};
+
+/* SERVICE WORKER */
+
+if('serviceWorker' in navigator){
+
+navigator.serviceWorker.register('/service-worker.js');
+
+}
+
 </script>
-  
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.log("SW Failed:", err));
-}
-</script>  
+
 </body>
 </html>
