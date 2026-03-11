@@ -1,5 +1,9 @@
 async function semakKod() {
 
+    if (typeof allowCheck === "function") {
+        if (!allowCheck()) return;
+    }
+
     const kod = document.getElementById("kodInput").value.trim();
     const resultBox = document.getElementById("result");
     const btnSijil = document.getElementById("btnSijil");
@@ -15,9 +19,33 @@ async function semakKod() {
 
     try {
 
-        const response = await fetch(CONFIG.API_URL + "?kod=" + encodeURIComponent(kod), {
-            method: "GET"
-        });
+        // ===============================
+        // GET USER LOCATION (OPTIONAL)
+        // ===============================
+
+        let lat = "";
+        let lon = "";
+
+        if (navigator.geolocation) {
+            try {
+                const pos = await new Promise((resolve,reject)=>{
+                    navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:3000});
+                });
+                lat = pos.coords.latitude;
+                lon = pos.coords.longitude;
+            } catch(e) {
+                console.log("Location skipped");
+            }
+        }
+
+        // ===============================
+        // FETCH API
+        // ===============================
+
+        const response = await fetch(
+            CONFIG.API_URL + "?kod=" + encodeURIComponent(kod) + "&lat=" + lat + "&lon=" + lon,
+            { method: "GET" }
+        );
 
         if (!response.ok) {
             throw new Error("HTTP Error " + response.status);
@@ -28,12 +56,19 @@ async function semakKod() {
         console.log("FULL DATA RECEIVED:", data);
 
         if (!data.success) {
-            resultBox.innerHTML = `<div style="color:red;">❌ ${data.message || "Kod tidak sah."}</div>`;
+
+            if (document.getElementById("soundFail")) {
+                document.getElementById("soundFail").play().catch(()=>{});
+            }
+
+            resultBox.innerHTML =
+            `<div style="color:red;">❌ ${data.message || "Kod tidak sah."}</div>`;
+
             return;
         }
 
         // ===============================
-        // SAFE STATUS HANDLING
+        // STATUS HANDLING
         // ===============================
 
         const statusPenebusan = (data.status_penebusan || "").trim().toUpperCase();
@@ -46,10 +81,11 @@ async function semakKod() {
         const badgeColor = STATUS_COLOR[statusPenebusan] || "#dc3545";
 
         // ===============================
-        // CONFETTI (hanya jika sah)
+        // CONFETTI
         // ===============================
 
         if ((data.kod_siri_status || "").includes("SAH")) {
+
             if (typeof confetti === "function") {
                 confetti({
                     particleCount: 120,
@@ -58,10 +94,15 @@ async function semakKod() {
                     colors: ['#ff99cc','#d4af37','#fff0f5']
                 });
             }
+
+            if (document.getElementById("soundSuccess")) {
+                document.getElementById("soundSuccess").play().catch(()=>{});
+            }
+
         }
 
         // ===============================
-        // PAPARAN DATA LENGKAP
+        // PAPAR RESULT CARD
         // ===============================
 
         resultBox.innerHTML = `
@@ -94,7 +135,15 @@ async function semakKod() {
         `;
 
         // ===============================
-        // SIJIL BUTTON
+        // POPUP PREMIUM
+        // ===============================
+
+        if (typeof showPopup === "function") {
+            showPopup(data);
+        }
+
+        // ===============================
+        // BUTTON SIJIL
         // ===============================
 
         if (btnSijil && data.sijil_url) {
@@ -103,7 +152,14 @@ async function semakKod() {
         }
 
     } catch (error) {
+
         console.error("FETCH ERROR:", error);
-        resultBox.innerHTML = "<div style='color:red;'>❌ Ralat sambungan server.</div>";
+
+        if (document.getElementById("soundFail")) {
+            document.getElementById("soundFail").play().catch(()=>{});
+        }
+
+        resultBox.innerHTML =
+        "<div style='color:red;'>❌ Ralat sambungan server.</div>";
     }
 }
