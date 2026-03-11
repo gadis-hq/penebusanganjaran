@@ -305,10 +305,25 @@ let html=`
 
 <h3 style="color:green">${data.kod_siri_status}</h3>
 
-<b>Nama:</b> ${data.nama}<br>
-<b>Hadiah:</b> ${data.hadiah}<br>
-<b>Bandar / Negeri:</b> ${data.bandar_negeri}<br>
-<b>Status Tebusan:</b> ${data.status_penebusan}
+<hr>
+
+<b>Nama:</b> ${data.nama || "-"}<br><br>
+
+<b>Hadiah:</b> ${data.hadiah || "-"}<br><br>
+
+<b>Pembelian Produk:</b> ${data.pembelian_produk || "-"}<br><br>
+
+<b>Harga:</b> ${data.harga || "-"}<br><br>
+
+<b>No Telefon:</b> ${data.no_telefon || "-"}<br><br>
+
+<b>No IC:</b> ${data.no_ic || "-"}<br><br>
+
+<b>Status Penebusan:</b> ${data.status_penebusan || "-"}<br><br>
+
+<b>Disahkan Oleh:</b> ${data.disahkan_oleh || "-"}<br><br>
+
+<b>Bandar / Negeri:</b> ${data.bandar_negeri || "-"}
 
 </div>
 
