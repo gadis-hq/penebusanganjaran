@@ -1,165 +1,132 @@
-async function semakKod() {
+function getParam(name){
 
-    if (typeof allowCheck === "function") {
-        if (!allowCheck()) return;
-    }
+const url = new URL(window.location.href);
+return url.searchParams.get(name);
 
-    const kod = document.getElementById("kodInput").value.trim();
-    const resultBox = document.getElementById("result");
-    const btnSijil = document.getElementById("btnSijil");
+}
 
-    if (!kod) {
-        resultBox.innerHTML = "<span style='color:red;'>Sila masukkan kod.</span>";
-        if(btnSijil) btnSijil.style.display = "none";
-        return;
-    }
+const kod = getParam("kod");
 
-    resultBox.innerHTML = "⏳ Sedang semak...";
-    if(btnSijil) btnSijil.style.display = "none";
+semakKod(kod);
 
-    try {
+function safe(v){
+if(!v || v==="") return "-";
+return v;
+}
 
-        // ===============================
-        // GET USER LOCATION (OPTIONAL)
-        // ===============================
+function semakKod(kod){
 
-        let lat = "";
-        let lon = "";
+fetch(CONFIG.API_URL + "?kod=" + encodeURIComponent(kod))
 
-        if (navigator.geolocation) {
-            try {
-                const pos = await new Promise((resolve,reject)=>{
-                    navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:3000});
-                });
-                lat = pos.coords.latitude;
-                lon = pos.coords.longitude;
-            } catch(e) {
-                console.log("Location skipped");
-            }
-        }
+.then(res=>res.json())
 
-        // ===============================
-        // FETCH API
-        // ===============================
+.then(data=>{
 
-        const response = await fetch(
-            CONFIG.API_URL + "?kod=" + encodeURIComponent(kod) + "&lat=" + lat + "&lon=" + lon,
-            { method: "GET" }
-        );
+document.getElementById("loading").style.display="none";
 
-        if (!response.ok) {
-            throw new Error("HTTP Error " + response.status);
-        }
+if(!data.success){
 
-        const data = await response.json();
+document.getElementById("result").innerHTML =
+"<div class='card'><b style='color:red'>Kod tidak sah</b></div>";
 
-        console.log("FULL DATA RECEIVED:", data);
+return;
+}
 
-        if (!data.success) {
+let html = `
 
-            if (document.getElementById("soundFail")) {
-                document.getElementById("soundFail").play().catch(()=>{});
-            }
+<div class="card">
 
-            resultBox.innerHTML =
-            `<div style="color:red;">❌ ${data.message || "Kod tidak sah."}</div>`;
+<div class="status" style="color:${data.color}">
+${safe(data.tajuk)}
+</div>
 
-            return;
-        }
+<table>
 
-        // ===============================
-        // STATUS HANDLING
-        // ===============================
+<tr>
+<td class="label">Kod Siri</td>
+<td>${safe(data.kod_siri)}</td>
+</tr>
 
-        const statusPenebusan = (data.status_penebusan || "").trim().toUpperCase();
+<tr>
+<td class="label">Nama</td>
+<td>${safe(data.nama)}</td>
+</tr>
 
-        const STATUS_COLOR = {
-            "TELAH DITEBUS": "#d4af37",
-            "BELUM DITEBUS": "#28a745"
-        };
+<tr>
+<td class="label">Hadiah</td>
+<td>${safe(data.hadiah)}</td>
+</tr>
 
-        const badgeColor = STATUS_COLOR[statusPenebusan] || "#dc3545";
+<tr>
+<td class="label">Status Kod</td>
+<td>${safe(data.status_kod)}</td>
+</tr>
 
-        // ===============================
-        // CONFETTI
-        // ===============================
+<tr>
+<td class="label">Produk</td>
+<td>${safe(data.produk)}</td>
+</tr>
 
-        if ((data.kod_siri_status || "").includes("SAH")) {
+<tr>
+<td class="label">Harga</td>
+<td>${safe(data.harga)}</td>
+</tr>
 
-            if (typeof confetti === "function") {
-                confetti({
-                    particleCount: 120,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#ff99cc','#d4af37','#fff0f5']
-                });
-            }
+<tr>
+<td class="label">No Telefon</td>
+<td>${safe(data.telefon)}</td>
+</tr>
 
-            if (document.getElementById("soundSuccess")) {
-                document.getElementById("soundSuccess").play().catch(()=>{});
-            }
+<tr>
+<td class="label">No IC</td>
+<td>${safe(data.ic)}</td>
+</tr>
 
-        }
+<tr>
+<td class="label">Status Penebusan</td>
+<td>${safe(data.status_penebusan)}</td>
+</tr>
 
-        // ===============================
-        // PAPAR RESULT CARD
-        // ===============================
+<tr>
+<td class="label">Disahkan Oleh</td>
+<td>${safe(data.disahkan)}</td>
+</tr>
 
-        resultBox.innerHTML = `
-            <div class="result-card" style="position:relative;">
-                <div class="watermark">GADIS QS HQ</div>
+<tr>
+<td class="label">Tarikh</td>
+<td>${formatTarikh(data.tarikh)}</td>
+</tr>
 
-                <div style="margin-bottom:10px;">
-                    <span style="
-                        background:${badgeColor};
-                        color:white;
-                        padding:6px 12px;
-                        border-radius:6px;
-                        font-weight:bold;
-                        display:inline-block;">
-                        ${data.kod_siri_status || ""}
-                    </span>
-                </div>
+<tr>
+<td class="label">Lokasi</td>
+<td>${safe(data.lokasi)}</td>
+</tr>
 
-                <p><strong>Nama:</strong> ${data.nama || "-"}</p>
-                <p><strong>Hadiah:</strong> ${data.hadiah || "-"}</p>
-                <p><strong>Status Kod:</strong> ${data.status_kod || "-"}</p>
-                <p><strong>Pembelian Produk:</strong> ${data.pembelian_produk || "-"}</p>
-                <p><strong>Harga:</strong> ${data.harga || "-"}</p>
-                <p><strong>No. Telefon:</strong> ${data.no_telefon || "-"}</p>
-                <p><strong>No. IC:</strong> ${data.no_ic || "-"}</p>
-                <p><strong>Status Penebusan:</strong> ${data.status_penebusan || "-"}</p>
-                <p><strong>Disahkan Oleh:</strong> ${data.disahkan_oleh || "-"}</p>
-                <p><strong>Bandar / Negeri:</strong> ${data.bandar_negeri || "-"}</p>
-            </div>
-        `;
+</table>
 
-        // ===============================
-        // POPUP PREMIUM
-        // ===============================
+</div>
 
-        if (typeof showPopup === "function") {
-            showPopup(data);
-        }
+`;
 
-        // ===============================
-        // BUTTON SIJIL
-        // ===============================
+document.getElementById("result").innerHTML = html;
 
-        if (btnSijil && data.sijil_url) {
-            btnSijil.href = data.sijil_url;
-            btnSijil.style.display = "inline-block";
-        }
+})
 
-    } catch (error) {
+.catch(err=>{
 
-        console.error("FETCH ERROR:", error);
+document.getElementById("loading").innerHTML =
+"❌ Ralat sambungan server";
 
-        if (document.getElementById("soundFail")) {
-            document.getElementById("soundFail").play().catch(()=>{});
-        }
+});
 
-        resultBox.innerHTML =
-        "<div style='color:red;'>❌ Ralat sambungan server.</div>";
-    }
+}
+
+function formatTarikh(t){
+
+if(!t) return "-";
+
+const d = new Date(t);
+
+return d.toLocaleDateString("ms-MY");
+
 }
