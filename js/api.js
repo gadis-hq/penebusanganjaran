@@ -1,26 +1,34 @@
-async function fetchKodSiri(kod) {
-    try {
-        const response = await fetch(
-            CONFIG.API_URL + "?kod=" + encodeURIComponent(kod),
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+window.fetchKodSiri = async function(kod) {
 
-        if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
-        }
+try {
 
-        const data = await response.json();
-        console.log("FULL DATA:", data); // untuk debug
+const url = CONFIG.API_URL + "?kod=" + encodeURIComponent(kod);
 
-        return data;
+console.log("REQUEST URL:", url);
 
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        return { success:false, message:"Ralat sambungan server." };
-    }
+const response = await fetch(url, {
+method: "GET"
+});
+
+if (!response.ok) {
+throw new Error("HTTP error " + response.status);
 }
+
+const data = await response.json();
+
+console.log("FULL DATA:", data);
+
+return data;
+
+} catch (error) {
+
+console.error("Fetch Error:", error);
+
+return {
+success:false,
+message:"Ralat sambungan server."
+};
+
+}
+
+};
