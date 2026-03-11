@@ -4,119 +4,302 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Semak Kod HQ</title>
+
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d4af37"> 
+<meta name="theme-color" content="#d4af37">
+
 <link rel="stylesheet" href="css/style.css">
+
 <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+
 <script src="js/config.js"></script>
 <script src="js/semakkod.js" defer></script>
+
+<style>
+
+/* Laser Scan Box */
+
+.scan-box{
+position:relative;
+height:120px;
+border:2px solid #d4af37;
+margin-top:10px;
+overflow:hidden;
+border-radius:8px;
+}
+
+.laser{
+position:absolute;
+width:100%;
+height:3px;
+background:red;
+animation:scan 2s linear infinite;
+}
+
+@keyframes scan{
+0%{top:0}
+100%{top:100%}
+}
+
+/* Popup Result */
+
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+z-index:999;
+}
+
+.popup-box{
+background:white;
+padding:25px;
+width:300px;
+margin:120px auto;
+border-radius:12px;
+text-align:center;
+}
+
+.ticker{
+background:#d4af37;
+color:black;
+padding:6px;
+font-weight:bold;
+overflow:hidden;
+white-space:nowrap;
+}
+
+</style>
+
 </head>
+
 <body>
+
+<div class="ticker" id="ticker">
+🏆 Tahniah kepada pemenang GADIS QS seluruh Malaysia
+</div>
+
 <div class="screenshot-overlay"></div>
+
 <div class="container">
 
-  <h1>🛡 Semak Kod Ganjaran</h1>
+<h1>🛡 Semak Kod Ganjaran</h1>
 
-  <div class="input-group">
-    <input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
-    <button onclick="semakKod()">✅ Semak Kod</button>
-    <button onclick="startScanner()">📷 Scan QR</button>
-  </div>
+<div class="input-group">
 
-  <div id="qr-reader" style="display:none; margin-top:10px;"></div>
+<input type="text" id="kodInput" placeholder="Masukkan Kod Siri">
 
-  <div id="result" class="result-box"></div>
+<button onclick="semakKod()">✅ Semak Kod</button>
 
-  <a id="btnSijil" target="_blank"
-     style="display:none; padding:10px 18px; margin-top:10px;
-            background:linear-gradient(45deg,#d4af37,#f8e58c);
-            color:black; font-weight:bold; border-radius:30px; text-decoration:none;">
-    Muat Turun Sijil Rasmi
-  </a>
+<button onclick="startScanner()">📷 Scan QR</button>
 
 </div>
 
+<div id="qr-reader" style="display:none;margin-top:10px;"></div>
+
+<div class="scan-box">
+<div class="laser"></div>
+</div>
+
+<div id="result" class="result-box"></div>
+
+<a id="btnSijil" target="_blank"
+style="display:none;padding:10px 18px;margin-top:10px;
+background:linear-gradient(45deg,#d4af37,#f8e58c);
+color:black;font-weight:bold;border-radius:30px;text-decoration:none;">
+Muat Turun Sijil Rasmi
+</a>
+
+</div>
+
+<!-- Popup Premium -->
+
+<div id="popupResult" class="popup">
+
+<div class="popup-box">
+
+<h2 id="popupTitle"></h2>
+
+<p id="popupNama"></p>
+
+<p id="popupHadiah"></p>
+
+<button onclick="closePopup()">Tutup</button>
+
+</div>
+
+</div>
+
+<!-- Sound -->
+
+<audio id="soundSuccess">
+<source src="sound/success.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="soundFail">
+<source src="sound/fail.mp3" type="audio/mpeg">
+</audio>
+
 <!-- Confetti -->
+
 <canvas id="confetti-canvas"></canvas>
 
 <script src="js/confetti.js" defer></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="js/sijil.js" defer></script>  
-  
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('ServiceWorker registered.', reg))
-        .catch(err => console.log('ServiceWorker registration failed:', err));
-    });
-  }
+<script src="js/sijil.js" defer></script>
 
- <script>
+<script>
+
+/* ==========================
+   SERVICE WORKER
+========================== */
+
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('service-worker.js')
+.then(reg => console.log('ServiceWorker registered.', reg))
+.catch(err => console.log('ServiceWorker registration failed:', err));
+});
+}
+
+/* ==========================
+   WINNER TICKER
+========================== */
+
+const winners = [
+"Rosmariati Hashim - RM50,000",
+"Noraini Muhammad - RM50,000",
+"Siti Aisyah - RM5,000"
+];
+
+let i=0;
+
+setInterval(()=>{
+
+document.getElementById("ticker").innerText =
+"🏆 Pemenang terbaru: " + winners[i];
+
+i++;
+
+if(i>=winners.length) i=0;
+
+},4000);
+
+/* ==========================
+   POPUP RESULT
+========================== */
+
+function showPopup(data){
+
+let p = document.getElementById("popupResult");
+
+document.getElementById("popupTitle").innerText = data.status_kod || "";
+document.getElementById("popupNama").innerText = data.nama || "";
+document.getElementById("popupHadiah").innerText = data.hadiah || "";
+
+p.style.display="block";
+
+if(data.success){
+document.getElementById("soundSuccess").play();
+}else{
+document.getElementById("soundFail").play();
+}
+
+}
+
+function closePopup(){
+document.getElementById("popupResult").style.display="none";
+}
+
+/* ==========================
+   ANTI BRUTE FORCE
+========================== */
+
+let checkCount=0;
+
+function allowCheck(){
+
+checkCount++;
+
+if(checkCount>5){
+alert("Terlalu banyak percubaan. Sila tunggu 1 minit.");
+return false;
+}
+
+setTimeout(()=>{checkCount=0},60000);
+
+return true;
+
+}
+
 /* ==========================
    ANTI SCREENSHOT PROTECTION
 ========================== */
-function activateProtection() {
 
-    const body = document.body;
+function activateProtection(){
 
-    // Dynamic watermark overlay
-    const wm = document.createElement("div");
-    wm.style.position = "fixed";
-    wm.style.top = "50%";
-    wm.style.left = "50%";
-    wm.style.transform = "translate(-50%, -50%) rotate(-30deg)";
-    wm.style.fontSize = "40px";
-    wm.style.opacity = "0.08";
-    wm.style.pointerEvents = "none";
-    wm.style.zIndex = "9999";
-    wm.style.whiteSpace = "nowrap";
-    wm.innerText = "GADIS QS HQ • " + new Date().toLocaleString();
-    body.appendChild(wm);
+const body=document.body;
 
-    // Blur when tab inactive
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            body.style.filter = "blur(12px)";
-        } else {
-            body.style.filter = "none";
-        }
-    });
+const wm=document.createElement("div");
 
-    // Block PrintScreen (basic attempt)
-    document.addEventListener("keyup", function(e) {
-        if (e.key === "PrintScreen") {
-            body.style.filter = "blur(15px)";
-            setTimeout(() => body.style.filter = "none", 2000);
-        }
-    });
+wm.style.position="fixed";
+wm.style.top="50%";
+wm.style.left="50%";
+wm.style.transform="translate(-50%,-50%) rotate(-30deg)";
+wm.style.fontSize="40px";
+wm.style.opacity="0.08";
+wm.style.pointerEvents="none";
+wm.style.zIndex="9999";
+wm.innerText="GADIS QS HQ • "+new Date().toLocaleString();
 
-    // Disable right click
-    document.addEventListener("contextmenu", e => e.preventDefault());
+body.appendChild(wm);
 
-    // Disable Ctrl+P
-    document.addEventListener("keydown", function(e){
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
-            e.preventDefault();
-        }
-    });
+document.addEventListener("visibilitychange",()=>{
+if(document.hidden){
+body.style.filter="blur(12px)";
+}else{
+body.style.filter="none";
+}
+});
 
-    // Detect DevTools open
-    let devtools = false;
-    setInterval(() => {
-        const widthThreshold = window.outerWidth - window.innerWidth > 160;
-        const heightThreshold = window.outerHeight - window.innerHeight > 160;
-        if (widthThreshold || heightThreshold) {
-            if (!devtools) {
-                body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>⚠ Sistem Dilindungi</h1>";
-                devtools = true;
-            }
-        }
-    }, 1000);
+document.addEventListener("keyup",function(e){
+if(e.key==="PrintScreen"){
+body.style.filter="blur(15px)";
+setTimeout(()=>body.style.filter="none",2000);
+}
+});
+
+document.addEventListener("contextmenu",e=>e.preventDefault());
+
+document.addEventListener("keydown",function(e){
+if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="p"){
+e.preventDefault();
+}
+});
+
+let devtools=false;
+
+setInterval(()=>{
+const widthThreshold=window.outerWidth-window.innerWidth>160;
+const heightThreshold=window.outerHeight-window.innerHeight>160;
+
+if(widthThreshold||heightThreshold){
+if(!devtools){
+body.innerHTML="<h1 style='text-align:center;margin-top:20%;'>⚠ Sistem Dilindungi</h1>";
+devtools=true;
+}
+}
+},1000);
+
 }
 
 activateProtection();
-</script> 
+
+</script>
+
 </body>
 </html>
